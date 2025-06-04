@@ -38,6 +38,9 @@ class ProductController extends Controller
 
     public function edit($id) {
         $products = session()->get('products', []);
+        if (! isset($products[$id])) {
+            abort(404);
+        }
         $product = $products[$id];
         return view('products.form', compact('product', 'id'));
     }
@@ -50,6 +53,9 @@ class ProductController extends Controller
 ]);
 
         $products = session()->get('products', []);
+        if (! isset($products[$id])) {
+            abort(404);
+        }
         $products[$id] = [
             'name' => $request->name,
             'description' => $request->description,
@@ -65,12 +71,18 @@ class ProductController extends Controller
 
     public function show($id) {
         $products = session()->get('products', []);
+        if (! isset($products[$id])) {
+            abort(404);
+        }
         $product = $products[$id];
         return view('products.show', compact('product'));
     }
 
     public function destroy($id) {
     $products = session()->get('products', []);
+    if (! isset($products[$id])) {
+        abort(404);
+    }
     unset($products[$id]);
     $products = array_values($products); // reset index
     session(['products' => $products]);
