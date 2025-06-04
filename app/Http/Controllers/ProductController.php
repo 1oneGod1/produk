@@ -4,17 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+// Controller yang menangani logika CRUD produk
 class ProductController extends Controller
 {
     /**
-     * Seed initial categories and products when none exist in the session.
+     * Mengisi data awal kategori dan produk jika belum ada di sesi.
      */
     private function seed(): void
     {
+        // Isi default kategori jika belum tersimpan di sesi
         if (!session()->has('categories')) {
             session(['categories' => ['Elektronik', 'Pakaian', 'Makanan']]);
         }
 
+        // Jika belum ada produk, buat dummy produk per kategori
         if (!session()->has('products')) {
             $categories = session('categories');
             $products = [];
@@ -32,11 +35,15 @@ class ProductController extends Controller
             session(['products' => $products]);
         }
     }
+    // Menampilkan daftar produk dengan filter dan sorting
     public function index(Request $request)
     {
+        // Pastikan data awal sudah ada
         $this->seed();
+        // Ambil produk dari sesi
         $products = session('products', []);
 
+        // Filter berdasarkan kata kunci pencarian
         if ($request->filled('q')) {
             $keyword = strtolower($request->q);
             $products = array_filter($products, function ($p) use ($keyword) {
@@ -45,28 +52,33 @@ class ProductController extends Controller
             });
         }
 
+        // Filter harga minimum
         if ($request->filled('min_price')) {
             $min = (int) $request->min_price;
             $products = array_filter($products, fn ($p) => $p['price'] >= $min);
         }
 
+        // Filter harga maksimum
         if ($request->filled('max_price')) {
             $max = (int) $request->max_price;
             $products = array_filter($products, fn ($p) => $p['price'] <= $max);
         }
 
+        // Sorting daftar produk
         if ($request->sort === 'name') {
             usort($products, fn ($a, $b) => strcmp($a['name'], $b['name']));
         } elseif ($request->sort === 'price') {
             usort($products, fn ($a, $b) => $a['price'] <=> $b['price']);
         }
 
+        // Tampilkan view dengan data produk
         return view('products.list', [
             'products' => $products,
             'request' => $request,
         ]);
     }
 
+    // Menampilkan form untuk membuat produk baru
     public function create()
     {
         $this->seed();
@@ -74,8 +86,10 @@ class ProductController extends Controller
         return view('products.form', compact('categories'));
     }
 
+    // Menyimpan produk baru
     public function store(Request $request)
     {
+        // Validasi input
         $request->validate([
             'name' => 'required|string|min:3',
             'description' => 'required|string',
@@ -98,6 +112,7 @@ class ProductController extends Controller
 
     }
 
+    // Menampilkan form edit produk
     public function edit($id)
     {
         $this->seed();
@@ -107,8 +122,10 @@ class ProductController extends Controller
         return view('products.form', compact('product', 'id', 'categories'));
     }
 
+    // Memperbarui data produk
     public function update(Request $request, $id)
     {
+        // Validasi input
         $request->validate([
             'name' => 'required|string|min:3',
             'description' => 'required|string',
@@ -131,6 +148,7 @@ class ProductController extends Controller
         
     }
 
+    // Menampilkan detail produk
     public function show($id)
     {
         $this->seed();
@@ -139,13 +157,14 @@ class ProductController extends Controller
         return view('products.show', compact('product'));
     }
 
+    // Menghapus produk dari sesi
     public function destroy($id) {
-    $products = session()->get('products', []);
-    unset($products[$id]);
-    $products = array_values($products); // reset index
-    session(['products' => $products]);
-    session()->flash('success', 'Produk berhasil dihapus.');
-    return redirect()->route('products.index');
+        $products = session()->get('products', []);
+        unset($products[$id]);
+        $products = array_values($products); // reset index
+        session(['products' => $products]);
+        session()->flash('success', 'Produk berhasil dihapus.');
+        return redirect()->route('products.index');
     }
 
 }

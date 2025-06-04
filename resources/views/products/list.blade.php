@@ -1,6 +1,7 @@
+{{-- Halaman daftar produk --}}
 <x-template title="Product List">
 
-    {{-- Flash message --}}
+    {{-- Menampilkan pesan sukses jika ada --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
             {{ session('success') }}
@@ -8,8 +9,10 @@
         </div>
     @endif
 
+    {{-- Tombol menambah produk baru --}}
     <a class="btn btn-success" href="{{ route('products.create') }}">Add new product</a>
 
+    {{-- Form pencarian dan filter --}}
     <form method="GET" class="row g-2 mt-3">
         <div class="col-md-3">
             <input type="text" name="q" class="form-control" placeholder="Search" value="{{ $request->q }}">
@@ -32,7 +35,7 @@
         </div>
     </form>
 
-    {{-- Cek jika kosong --}}
+    {{-- Tampilkan pesan jika tidak ada produk --}}
     @if(count($products) == 0)
         <p class="text-muted mt-3">Belum ada produk.</p>
     @else
