@@ -8,7 +8,8 @@
 <body>
 <nav class="navbar navbar-expand-lg bg-light mb-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ route('products.index') }}">Produk</a>
+        <a class="navbar-brand" href="/">Home</a>
+        <a class="nav-link" href="{{ route('products.index') }}">Products</a>
     </div>
 </nav>
 <div class="container">

@@ -25,6 +25,15 @@
             <input type="number" name="price" class="form-control" required value="{{ $product['price'] ?? '' }}">
         </x-form.group>
 
+        <x-form.group for="category" label="Category">
+            <select name="category" class="form-select" required>
+                <option value="" disabled {{ empty($product['category'] ?? '') ? 'selected' : '' }}>Select</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat }}" {{ ($product['category'] ?? '') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
+                @endforeach
+            </select>
+        </x-form.group>
+
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </x-template>
